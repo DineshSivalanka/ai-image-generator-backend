@@ -1,6 +1,6 @@
 const express = require('express');
-const axios = require('axios');
 const cors = require('cors');
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -10,24 +10,31 @@ app.use(cors());
 app.use(express.json());
 
 app.post('/generate', async (req, res) => {
-    const { prompt } = req.body;
+  const { prompt } = req.body;
 
-    try {
+  try {
     const response = await axios.post(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GEMINI_API_KEY,
-        {
-        contents: [{ parts: [{ text: `Generate an image based on: ${prompt}` }] }]
+      'https://api.replicate.com/v1/predictions',
+      {
+        version: "db21e45a860f62040b6016e8e5de54c2a4e1c5fdfaa0a13f3dbd4f48e9f3f48c", // Stable Diffusion 1.5
+        input: { prompt: prompt }
+      },
+      {
+        headers: {
+          Authorization: `Token ${process.env.REPLICATE_API_TOKEN}`,
+          'Content-Type': 'application/json'
         }
+      }
     );
 
-    const image = response.data.candidates?.[0]?.content?.parts?.[0]?.text || 'No image generated';
-    res.json({ image });
-    } catch (error) {
-    console.error((error.response && error.response.data) || error.message);
-    res.status(500).json({ error: 'Failed to generate image' });
-    }
+    const prediction = response.data;
+    res.json({ image: prediction.urls.get });
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    res.status(500).json({ error: 'Image generation failed' });
+  }
 });
 
-app.listen(5000, '0.0.0.0', () => {
-    console.log(`Backend running on http://0.0.0.0:5000`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Backend running on http:54.242.88.240:5000:${PORT}`);
 });
