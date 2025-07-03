@@ -36,5 +36,5 @@ app.post('/generate', async (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Backend running on http:54.90.83.127:5000:${PORT}`);
+  console.log(`Backend running on http:54.90.83.127:${PORT}`);
 });
