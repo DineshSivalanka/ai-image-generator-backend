@@ -9,6 +9,12 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
+// ✅ Health check route
+app.get('/', (req, res) => {
+  res.send('✅ AI Image Generator Backend is running.');
+});
+
+// ✅ Image generation route
 app.post('/generate', async (req, res) => {
   const { prompt } = req.body;
 
@@ -17,7 +23,7 @@ app.post('/generate', async (req, res) => {
       'https://api.replicate.com/v1/predictions',
       {
         version: "db21e45a860f62040b6016e8e5de54c2a4e1c5fdfaa0a13f3dbd4f48e9f3f48c", // Stable Diffusion 1.5
-        input: { prompt: prompt }
+        input: { prompt }
       },
       {
         headers: {
@@ -30,11 +36,12 @@ app.post('/generate', async (req, res) => {
     const prediction = response.data;
     res.json({ image: prediction.urls.get });
   } catch (error) {
-    console.error(error.response?.data || error.message);
+    console.error('❌ Error generating image:', error.response?.data || error.message);
     res.status(500).json({ error: 'Image generation failed' });
   }
 });
 
+// ✅ Start server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Backend running on http:54.90.83.127:${PORT}`);
+  console.log(`✅ Backend running on http://54.90.83.127:${PORT}`);
 });
